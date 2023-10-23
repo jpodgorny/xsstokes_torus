@@ -1,15 +1,5 @@
-Table of contents
-=================
-
-* [Model description](#model-description)
-* [References](#references)
-* [Model parameters](#model-parameters)
-* [Required files](#required-files)
-* [Installation and usage in XSPEC](#installation-and-usage-in-xspec)
-
-
 Model description
-=================
+-----------------
 
 This model computes the emission and its polarisation properties from
 an X-ray source of power-law emission of arbitrary incident polarisation 
@@ -33,36 +23,35 @@ is an isotropic point-like emission. The output has arbitrary flux
 normalization.
 
 For any issues regarding the use of xsstokes_torus, please, contact J. Podgorný at 
-[jakub.podgorny@asu.cas.cz](mailto:jakub.podgorny@asu.cas.cz) or M. Dovčiak
-[michal.dovciak@asu.cas.cz](mailto:michal.dovciak@asu.cas.cz).
+jakub.podgorny@asu.cas.cz or M. Dovčiak at michal.dovciak@asu.cas.cz.
 
 
 References
-==========
+----------
 
-Podgorný J, Dovčiak M, Marin F (2023)  
-_Simple numerical X-ray polarization models of reflecting axially symmetric structures around accreting compact objects_  
-[MNRAS, submitted]()
-[[arXiv:]()]
+Podgorný J, Dovčiak M, Marin F (in prep.)  
+Simple numerical X-ray polarization models of reflecting axially symmetric structures around accreting compact objects
+MNRAS, submitted ()
+arXiv: ()
 
 
 Model parameters
-================
+----------------
 
-* **par1 ... PhoIndex** 
+* par1 ... PhoIndex 
   - photon index of the primary power-law X-ray flux
-* **par2 ... cos_incl** 
+* par2 ... cos_incl 
   - cosine of the observer inclination (1.-pole, 0.-disc)
-* **par3 ... Theta**  
+* par3 ... Theta  
   - torus half-opening angle between 25 deg and 85 deg 
-* **par4 ... poldeg**  
+* par4 ... poldeg
   - intrinsic polarisation degree of primary radiation between 0. and 1.
-* **par5 ... chi**  
+* par5 ... chi
   - intrinsic polarisation angle (in degrees, -90 < chi < 90) of primary radiation
   - the orientation is degenarate by 180 degrees
-* **par6 ... zshift**
+* par6 ... zshift
   - overall Doppler shift
-* **par7 ... Stokes**
+* par7 ... Stokes
   - defines the output of the model:
     - -1: the output is defined according to the XFLT0001 keyword of the 
           SPECTRUM extension of the data file, where "Stokes:0" means photon 
@@ -84,69 +73,66 @@ Model parameters
     - 10: array of Stokes parameter V devided by I
 
 Required files
-==============
+--------------
 
-* **Source code files**
-  (in [xsstokes_torus-master.tar.gz](https://github.com/jpodgorny/xsstokes_torus/-/archive/master/xsstokes_torus-master.tar.gz)):
+* Source code files in xsstokes_torus-master.tar.gz (https://github.com/jpodgorny/xsstokes_torus/-/archive/master/xsstokes_torus-master.tar.gz):
   - xsstokes_torus.c
   - lmodel-stokesni.dat  
-* **reprocessing tables**
-  (for reprocessing of photons in distant opaque toroidal structure, more details in Podgorný J. et al. (in prep.))
-  - [23576493.zip](https://doi.org/10.6084/m9.figshare.23576493)  
+* tables for reprocessing of photons in distant opaque toroidal structure, more details in Podgorný J. et al. (in prep.)
+  - 23576493.zip (https://doi.org/10.6084/m9.figshare.23576493)  
 
 
 Installation and usage in XSPEC
-===============================
+-------------------------------
 
-1. **Download the source code files**
-   ([xsstokes_torus-master.tar.gz](https://github.com/jpodgorny/xsstokes_torus/-/archive/master/xsstokes_torus-master.tar.gz)) 
+1. Download the source code files xsstokes_torus-master.tar.gz (https://github.com/jpodgorny/xsstokes_torus/-/archive/master/xsstokes_torus-master.tar.gz)
    into a directory where you want to install the model, e.g. '/path/to/models/'
    
-2. **Uncompress the source code files**, e.g. by the command:
+2. Uncompress the source code files, e.g. by the command:
 
-   `tar -xzf xsstokes_torus-master.tar.gz`
+   tar -xzf xsstokes_torus-master.tar.gz
 
    This will create a new directory 'xsstokes_torus-master' in the '/path/to/models/' 
    directory with the xsstokes_torus source code files.
 
-3. **Download the FITS files** 
-   [23576493.zip](https://doi.org/10.6084/m9.figshare.23576493) 
+3. Download the FITS files 
+   23576493.zip (https://doi.org/10.6084/m9.figshare.23576493) 
    with the tables into the directory with xsstokes_torus, i.e. '/path/to/models/xsstokes_torus-master'.
 
-4. **Unzip the reflection tables** with polarisation information, e.g. by the command:
+4. Unzip the reflection tables with polarisation information, e.g. by the command:
 
-   `unzip 23576493.zip`
+   unzip 23576493.zip
    
-5. **Compile the code** inside XSPEC (needed to be done only once):
+5. Compile the code inside XSPEC (needed to be done only once):
 
    The code is compiled inside XSPEC with the following command (assuming all 
    the source files and FITS tables are in the directory 
    '/path/to/models/xsstokes_torus-master'):
 
-   `initpackage stokesni lmodel-stokesni.dat /path/to/models/xsstokes_torus-master`
+   initpackage stokesni lmodel-stokesni.dat /path/to/models/xsstokes_torus-master
 
-   **Note**:
+   Note:
    Your XSPEC installation must have been originally installed from the source 
    code distribution. Local models, like xsstokes_torus, cannot be used if the XSPEC 
    was originally installed from the pre-compiled binary distribution.
 
-6. **Load the xsstokes_torus model** into XSPEC:
+6. Load the xsstokes_torus model into XSPEC:
 
    To use the xsstokes_torus model inside XSPEC, first the model package needs to be 
    loaded and directory containing the xsstokes_torus set:
 
-   `lmod stokesni /path/to/models/xsstokes_torus-master`  
+   lmod stokesni /path/to/models/xsstokes_torus-master
 
-7. Then the **xsstokes_torus model may be used** in the usual way, e.g.:
+7. Then the xsstokes_torus model may be used in the usual way, e.g.:
 
-   `mo stokes`
+   mo stokes
 
-   **Note**:
+   Note:
    In case of segmentation fault, one may need to increase the stack size before 
    launching XSPEC, e.g. with the command:
 
-   `ulimit -s unlimited`
+   ulimit -s unlimited
 
    or 
 
-   `ulimit -s 65532`
+   ulimit -s 65532
