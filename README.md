@@ -87,7 +87,6 @@ Required files
 ==============
 
 * **Source code files**
-  (in [xsstokes_torus-master.tar.gz](https://github.com/jpodgorny/xsstokes_torus/-/archive/master/xsstokes_torus-master.tar.gz)):
   - xsstokes_torus.c
   - lmodel-stokesni.dat  
 * **reprocessing tables**
@@ -99,45 +98,37 @@ Installation and usage in XSPEC
 ===============================
 
 1. **Download the source code files**
-   ([xsstokes_torus-master.tar.gz](https://github.com/jpodgorny/xsstokes_torus/-/archive/master/xsstokes_torus-master.tar.gz)) 
-   into a directory where you want to install the model, e.g. '/path/to/models/'
-   
-2. **Uncompress the source code files**, e.g. by the command:
+   into a directory where you want to install the model, e.g. '/path/to/xsstokes_torus-master/'
 
-   `tar -xzf xsstokes_torus-master.tar.gz`
-
-   This will create a new directory 'xsstokes_torus-master' in the '/path/to/models/' 
-   directory with the xsstokes_torus source code files.
-
-3. **Download the FITS files** 
+2. **Download the FITS files** 
    [23576493.zip](https://doi.org/10.6084/m9.figshare.23576493) 
-   with the tables into the directory with xsstokes_torus, i.e. '/path/to/models/xsstokes_torus-master'.
+   with the tables into the directory with xsstokes_torus, i.e. '/path/to/xsstokes_torus-master'.
 
-4. **Unzip the reflection tables** with polarisation information, e.g. by the command:
+3. **Unzip the reflection tables** with polarisation information, e.g. by the command:
 
    `unzip 23576493.zip`
    
-5. **Compile the code** inside XSPEC (needed to be done only once):
+4. **Compile the code** inside XSPEC (needed to be done only once):
 
    The code is compiled inside XSPEC with the following command (assuming all 
    the source files and FITS tables are in the directory 
-   '/path/to/models/xsstokes_torus-master'):
+   '/path/to/xsstokes_torus-master'):
 
-   `initpackage stokesni lmodel-stokesni.dat /path/to/models/xsstokes_torus-master`
+   `initpackage stokesni lmodel-stokesni.dat /path/to/xsstokes_torus-master`
 
    **Note**:
    Your XSPEC installation must have been originally installed from the source 
    code distribution. Local models, like xsstokes_torus, cannot be used if the XSPEC 
    was originally installed from the pre-compiled binary distribution.
 
-6. **Load the xsstokes_torus model** into XSPEC:
+5. **Load the xsstokes_torus model** into XSPEC:
 
    To use the xsstokes_torus model inside XSPEC, first the model package needs to be 
    loaded and directory containing the xsstokes_torus set:
 
-   `lmod stokesni /path/to/models/xsstokes_torus-master`  
+   `lmod stokesni /path/to/xsstokes_torus-master`  
 
-7. Then the **xsstokes_torus model may be used** in the usual way, e.g.:
+6. Then the **xsstokes_torus model may be used** in the usual way, e.g.:
 
    `mo stokes`
 
