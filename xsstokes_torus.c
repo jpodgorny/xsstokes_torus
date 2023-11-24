@@ -5,6 +5,11 @@
  * 
  * -----------------------------------------------------------------------------
  *
+ * !! CAUTION, THE MODEL IS STILL IN A TESTING MODE, DO NOT USE FOR HIGHER 
+ * INCLINATIONS AND LOWER HALF-OPENING ANGLES, THAN SUGGESTED BY THE 
+ * lmodel-stokesni.dat FILE !!
+ *
+ * -----------------------------------------------------------------------------
  *
  * par1 ... PhoIndex - power-law photon index of the primary flux
  * par2 ... cos_incl - cosine of the observer inclination (1.-pole, 0.-disc)
@@ -51,9 +56,9 @@
 /*******************************************************************************
 *******************************************************************************/
 
-#define REFSPECTRA1 "stokes-neutral-iso-UNPOL-torus.fits\0" // UNPOLARISED
-#define REFSPECTRA2 "stokes-neutral-iso-HRPOL-torus.fits\0" // HORIZONTALLY POLARISED
-#define REFSPECTRA3 "stokes-neutral-iso-45DEG-torus.fits\0" // DIAGONALLY POLARISED
+#define REFSPECTRA1 "stokes-neutral-iso-UNPOL-torus.fits" // UNPOLARISED
+#define REFSPECTRA2 "stokes-neutral-iso-HRPOL-torus.fits" // HORIZONTALLY POLARISED
+#define REFSPECTRA3 "stokes-neutral-iso-45DEG-torus.fits" // DIAGONALLY POLARISED
 
 #define PI   3.14159265358979
 #define NPAR 4
@@ -69,7 +74,7 @@ void stokes(const double *ear, int ne, const double *param, int ifl,
             double *photar, double *photer, const char* init) {
 
 FILE   *fw;
-char   refspectra[3][33] = {{REFSPECTRA1},{REFSPECTRA2},{REFSPECTRA3}};
+char   refspectra[3][36] = {{REFSPECTRA1},{REFSPECTRA2},{REFSPECTRA3}};
 int    i, j, ie, stokes;
 double pol_deg, pos_ang, chi;
 const char*   xfltname = "Stokes";
@@ -115,14 +120,14 @@ if(stokes){//we use polarised tables
     for(j=0; j<=2; j++) Smatrix[j+3][ie] -= Smatrix[j][ie];
     for(j=0; j<=2; j++) Smatrix[j+6][ie] -= Smatrix[j][ie];
     far[ie] = Smatrix[0][ie] +
-                pol_deg * ( -Smatrix[3][ie] * cos(2.*(chi+pos_ang)) +
-                            Smatrix[6][ie] * sin(2.*(chi+pos_ang)) );
+                pol_deg * ( -Smatrix[3][ie] * cos(2.*(chi)) +
+                            Smatrix[6][ie] * sin(2.*(chi)) );
     qar[ie] = Smatrix[1][ie] +
-                pol_deg * ( -Smatrix[4][ie] * cos(2.*(chi+pos_ang))+
-                            Smatrix[7][ie] * sin(2.*(chi+pos_ang)) );
+                pol_deg * ( -Smatrix[4][ie] * cos(2.*(chi))+
+                            Smatrix[7][ie] * sin(2.*(chi)) );
     uar[ie] = Smatrix[2][ie] +
-                pol_deg * ( -Smatrix[5][ie] * cos(2.*(chi+pos_ang))+
-                            Smatrix[8][ie] * sin(2.*(chi+pos_ang)) );
+                pol_deg * ( -Smatrix[5][ie] * cos(2.*(chi))+
+                            Smatrix[8][ie] * sin(2.*(chi)) );
     var[ie] = 0.;                               
                               
     // far[ie] = ( 1. + pol_deg ) * Smatrix[0][ie] - pol_deg * Smatrix[3][ie];
@@ -142,13 +147,13 @@ if(stokes){//we use polarised tables
 // interface with XSPEC
 if (!stokes) for (ie = 0; ie < ne; ie++) photar[ie] = far[ie];
 else {
-  // let's change the orientation of the system 
-  //if(pos_ang != 0.)
-  //  for( ie=0; ie<ne; ie++ ){
-  //    qar_final[ie] = qar[ie] * cos(2*pos_ang) - uar[ie] * sin(2*pos_ang);
-  //   uar_final[ie] = uar[ie] * cos(2*pos_ang) + qar[ie] * sin(2*pos_ang);
-  //  }
-  // else
+//   let's change the orientation of the system 
+  if(pos_ang != 0.)
+    for( ie=0; ie<ne; ie++ ){
+      qar_final[ie] = qar[ie] * cos(2*pos_ang) - uar[ie] * sin(2*pos_ang);
+     uar_final[ie] = uar[ie] * cos(2*pos_ang) + qar[ie] * sin(2*pos_ang);
+    }
+   else
   for( ie=0; ie<ne; ie++ ){
       qar_final[ie] = qar[ie];
       uar_final[ie] = uar[ie];

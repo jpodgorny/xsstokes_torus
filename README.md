@@ -11,6 +11,10 @@ Table of contents
 Model description
 =================
 
+!! CAUTION, THE MODEL IS STILL IN A TESTING MODE, DO NOT USE FOR HIGHER 
+INCLINATIONS AND LOWER HALF-OPENING ANGLES, THAN SUGGESTED BY THE 
+lmodel-stokesni.dat FILE !!
+
 This model computes the emission and its polarisation properties from
 an X-ray source of power-law emission of arbitrary incident polarisation 
 that is reprocessed in axially symmetric structures. The reprocessing
@@ -18,7 +22,7 @@ is precomputed in a form of FITS fits files that are required for
 usage. These files were computed for three different states
 of incident polarisation and this model interpolates for any primary
 polarisation state. In addition it possesses other properties of the
-reprocessing tables that were precomputed for a particular problem.
+reprocessing tables that were precomputed for nearly neutral disc reflection.
 
 In this case of xsstokes_torus, it is reflection from a toroidal structure,
 representing an opaque AGN torus illuminated by a central hot X-ray corona.
@@ -43,7 +47,7 @@ References
 Podgorný J, Dovčiak M, Marin F (2023)  
 _Simple numerical X-ray polarization models of reflecting axially symmetric structures around accreting compact objects_  
 [MNRAS, submitted]()
-[[arXiv:]()]
+[[arXiv:2310.15647](https://arxiv.org/abs/2310.15647)]
 
 
 Model parameters
@@ -60,9 +64,14 @@ Model parameters
 * **par5 ... chi**  
   - intrinsic polarisation angle (in degrees, -90 < chi < 90) of primary radiation
   - the orientation is degenarate by 180 degrees
-* **par6 ... zshift**
+* **par6 ... pos_ang**  
+  - orientation of the system (-90 < pos_ang < 90), 
+  - the position angle (in degrees) of the system 
+  - rotation axis with direction up,
+  - the orientation is degenarate by 180 degrees
+* **par7 ... zshift**
   - overall Doppler shift
-* **par7 ... Stokes**
+* **par8 ... Stokes**
   - defines the output of the model:
     - -1: the output is defined according to the XFLT0001 keyword of the 
           SPECTRUM extension of the data file, where "Stokes:0" means photon 
