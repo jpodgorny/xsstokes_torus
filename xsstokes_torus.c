@@ -5,25 +5,26 @@
  * 
  * -----------------------------------------------------------------------------
  *
- * !! CAUTION, THE MODEL IS STILL IN A TESTING MODE, DO NOT USE FOR HIGHER 
- * INCLINATIONS AND LOWER HALF-OPENING ANGLES, THAN SUGGESTED BY THE 
- * lmodel-stokesni.dat FILE !!
+ * !! CAUTION, THE MODEL IS STILL IN A TESTING MODE !!
  *
  * -----------------------------------------------------------------------------
  *
  * par1 ... PhoIndex - power-law photon index of the primary flux
  * par2 ... cos_incl - cosine of the observer inclination (1.-pole, 0.-disc)
- * par3 ... Theta - torus half-opening angle between 25 deg and 85 deg 
- * par4 ... poldeg  - intrinsic polarisation degree of primary radiation
- * par5 ... chi - intrinsic polarisation angle (in degrees, -90 < chi < 90)
+ * par3 ... trTheta - transformed torus half-opening angle between 0 and 1
+ * par4 ... B - taking into account region below equator in integration
+ *			= 1  - yes
+ *			= 0  - no
+ * par5 ... poldeg  - intrinsic polarisation degree of primary radiation
+ * par6 ... chi - intrinsic polarisation angle (in degrees, -90 < chi < 90)
  *		       of primary radiation, the orientation is degenarate by 
  *		       180 degrees
- * par6 ... pos_ang - orientation of the system (-90 < pos_ang < 90), 
+ * par7 ... pos_ang - orientation of the system (-90 < pos_ang < 90), 
  *                    the position angle (in degrees) of the system 
  *                    rotation axis with direction up,
  *                    the orientation is degenarate by 180 degrees
- * par7 ... zshift  - overall Doppler shift
- * par8 ... Stokes  - what should be stored in photar() array, i.e. as output
+ * par8 ... zshift  - overall Doppler shift
+ * par9 ... Stokes  - what should be stored in photar() array, i.e. as output
  *                    = -1 - the output is defined according to the XFLT0001 
  *                           keyword of the SPECTRUM extension of the data file,
  *                           where "Stokes:0" means photon number density flux,
@@ -52,19 +53,62 @@
 
 #include <math.h>
 #include <stdio.h>
+#include <stdlib.h>
 
+/*******************************************************************************
+*******************************************************************************/
+#ifdef OUTSIDE_XSPEC
+
+#define IFL    1
+#define NPARAM 5
+#define NE     300
+#define E_MIN  0.1
+#define E_MAX  100.
+
+int main() {
+
+void stokes(const double *ear, int ne, const double *param, int ifl, 
+               double *photar, double *photer, const char* init);
+
+double ear[NE+1], photar[NE], photer[NE], param[NPARAM];
+char   initstr[0] = "";
+int    ie;
+
+param[ 0] = 2.0;        // PhoIndex
+param[ 1] = 0.775;      // cos_incl
+param[ 2] = 0.5;        // trTheta
+param[ 3] = 1.;         // B
+param[ 4] = 0.;         // poldeg
+param[ 5] = 0.;         // chi
+param[ 6] = 0.;         // pos_ang
+param[ 7] = 0.;         // zshift
+param[ 8] = 1.;         // Stokes
+
+for(ie = 0; ie <= NE; ie++) {
+//  ear[ie] = E_MIN + ie * (E_MAX-E_MIN) / NE;
+  ear[ie] = E_MIN * pow(E_MAX / E_MIN, ((double) ie) / NE);
+}
+
+stokes(ear, NE, param, IFL, photar, photer, initstr);
+return(0);
+}
+
+#endif
 /*******************************************************************************
 *******************************************************************************/
 
 #define REFSPECTRA1 "stokes-neutral-iso-UNPOL-torus.fits" // UNPOLARISED
 #define REFSPECTRA2 "stokes-neutral-iso-HRPOL-torus.fits" // HORIZONTALLY POLARISED
 #define REFSPECTRA3 "stokes-neutral-iso-45DEG-torus.fits" // DIAGONALLY POLARISED
+#define VISIBILITY_FILE "visibility_line.txt" // Text file containing Theta_limit
+#define MAX_SIZE 40000  // Size of the visibility line text file
 
 #define PI   3.14159265358979
-#define NPAR 4
+#define NPAR 5
 
 extern int    xs_write(char* wrtstr, int idest);
 extern float  DGFILT(int ifl, const char* key);
+extern void   FPMSTR(const char* value1, const char* value2);
 extern void   tabintxflt(float* ear, int ne, float* param, const int npar, 
                          const char* filenm, const char **xfltname, 
                          const float *xfltvalue, const int nxflt,
@@ -73,24 +117,43 @@ extern void   tabintxflt(float* ear, int ne, float* param, const int npar,
 void stokes(const double *ear, int ne, const double *param, int ifl, 
             double *photar, double *photer, const char* init) {
 
+
 FILE   *fw;
-char   refspectra[3][36] = {{REFSPECTRA1},{REFSPECTRA2},{REFSPECTRA3}};
+//static char   xsdir[255]="";
+//static char   pname[128]="XSDIR", ptrue_Theta_out[128] = "true_Theta";
+static char   refspectra[3][36] = {{REFSPECTRA1},{REFSPECTRA2},{REFSPECTRA3}};
+
+// - if set try XSDIR directory, otherwise look in the working directory
+//   or in the xspec directory where tables are usually stored...
+//if (strlen(xsdir) == 0) refspectra = {{REFSPECTRA1},{REFSPECTRA2},{REFSPECTRA3}};
+//else if (xsdir[strlen(xsdir) - 1] == '/') refspectra = {{"%s%s", xsdir, REFSPECTRA1},{"%s%s", xsdir, REFSPECTRA2},{"%s%s", xsdir, REFSPECTRA3}};
+//else refspectra = {{"%s/%s", xsdir, REFSPECTRA1},{"%s/%s", xsdir, REFSPECTRA2},{"%s/%s", xsdir, REFSPECTRA3}};
+
 int    i, j, ie, stokes;
 double pol_deg, pos_ang, chi;
 const char*   xfltname = "Stokes";
 float  xfltvalue;
 float  Smatrix[9][ne];
-float  fl_param[NPAR]={(float) param[0], (float) param[1], (float) param[2], (float) param[6]};
+float  fl_param[NPAR]={(float) param[0], (float) param[1], (float) param[2], (float) param[3], (float) param[7]};
 const char*  tabtyp="add";
 float  fl_ear[ne+1], fl_photer[ne];
 double far[ne], qar[ne], uar[ne], var[ne], pd[ne], pa[ne], pa2[ne], 
        qar_final[ne], uar_final[ne];
 double pamin, pamax, pa2min, pa2max;
 
-pol_deg = param[3];
-chi = param[4]/180.*PI;
-pos_ang = param[5]/180.*PI;
-stokes = (int) param[7];
+FILE *file;
+double vis_Theta[MAX_SIZE], vis_inc[MAX_SIZE];
+double x0, y, x1, y1, x2, y2;
+int count = 0, k;
+double trTheta, mue_tot, Theta_limit, min_Theta, max_Theta, true_Theta;
+char true_Theta_out;
+
+mue_tot = (float) param[1];
+trTheta = (float) param[2];
+pol_deg = param[4];
+chi = param[5]/180.*PI;
+pos_ang = param[6]/180.*PI;
+stokes = (int) param[8];
 if(stokes == -1){
   xfltvalue = DGFILT(ifl, xfltname);
   if (xfltvalue == 0. || xfltvalue == 1. || xfltvalue == 2.){
@@ -143,6 +206,64 @@ if(stokes){//we use polarised tables
     far[ie] = Smatrix[0][ie];
   }
 }
+
+
+// let's transform trTheta back to true_theta
+
+file = fopen(VISIBILITY_FILE, "rt");
+if (file == NULL) {
+perror("Error opening file");
+return -1;
+}
+
+while (fscanf(file, "%lf %lf", &vis_Theta[count], &vis_inc[count]) == 2) {
+count++;
+}
+fclose(file);
+
+x0 = acos(mue_tot) / PI * 180.0;  // Interpolation point
+
+// Inline linear interpolation
+for (i = 0; i < count - 1; i++) {
+x1 = vis_inc[i];
+y1 = vis_Theta[i];
+x2 = vis_inc[i + 1];
+y2 = vis_Theta[i + 1];
+if (x0 >= x1 && x0 <= x2) {
+    Theta_limit = y1 + (x0 - x1) * (y2 - y1) / (x2 - x1);
+    break;
+}
+}
+
+// Ensure Theta_limit is set; you may need additional logic for extrapolation.
+if (i == count - 1) {
+fprintf(stderr, "Interpolation point is out of range.\n");
+return -1;
+}
+
+min_Theta = fmax(25.0, Theta_limit);
+max_Theta = 90.0;
+true_Theta = trTheta * (max_Theta - min_Theta) + min_Theta;
+
+//sprintf(true_Theta_out, "%12.6f\n", true_Theta);
+//FPMSTR(ptrue_Theta_out, true_Theta_out);
+/******************************************************************************/
+//#ifdef OUTSIDE_XSPEC
+// let's write the input parameters to a file
+fw = fopen("parameters.txt", "w");
+fprintf(fw, "PhoIndex        %12.6f\n", param[0]);
+fprintf(fw, "cos_incl     %12.6f\n", param[1]);
+fprintf(fw, "trTheta         %12.6f\n", param[2]);
+fprintf(fw, "B          %12.6f\n", param[3]);
+fprintf(fw, "poldeg        %12.6f\n", param[4]);
+fprintf(fw, "chi         %12.6f\n", param[5]);
+fprintf(fw, "pos_ang        %12.6f\n", param[6]);
+fprintf(fw, "zshift      %12.6f\n", param[7]);
+fprintf(fw, "Stokes      %12d\n", (int) param[8]);
+fprintf(fw, "true_Theta      %12.6f\n", true_Theta);
+fclose(fw);
+//#endif
+/******************************************************************************/
 
 // interface with XSPEC
 if (!stokes) for (ie = 0; ie < ne; ie++) photar[ie] = far[ie];
@@ -208,6 +329,7 @@ else {
   }
   fclose(fw);
 }
+
 
 return;
 }
