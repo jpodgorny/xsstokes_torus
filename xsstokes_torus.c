@@ -61,8 +61,8 @@
 
 #define IFL    1
 #define NPARAM 5
-#define NE     300
-#define E_MIN  0.1
+#define NE     200
+#define E_MIN  1.
 #define E_MAX  100.
 
 int main() {
@@ -119,15 +119,31 @@ void stokes(const double *ear, int ne, const double *param, int ifl,
 
 
 FILE   *fw;
-//static char   xsdir[255]="";
-//static char   pname[128]="XSDIR", ptrue_Theta_out[128] = "true_Theta";
-static char   refspectra[3][36] = {{REFSPECTRA1},{REFSPECTRA2},{REFSPECTRA3}};
+static char   xsdir[255]="";
+static char   pname[128]="XSDIR", ptrue_Theta_out[128] = "true_Theta", pinc_degrees[128] = "inc_degrees";
+static char refspectra[3][255], visibility_path[255];
 
 // - if set try XSDIR directory, otherwise look in the working directory
 //   or in the xspec directory where tables are usually stored...
-//if (strlen(xsdir) == 0) refspectra = {{REFSPECTRA1},{REFSPECTRA2},{REFSPECTRA3}};
-//else if (xsdir[strlen(xsdir) - 1] == '/') refspectra = {{"%s%s", xsdir, REFSPECTRA1},{"%s%s", xsdir, REFSPECTRA2},{"%s%s", xsdir, REFSPECTRA3}};
-//else refspectra = {{"%s/%s", xsdir, REFSPECTRA1},{"%s/%s", xsdir, REFSPECTRA2},{"%s/%s", xsdir, REFSPECTRA3}};
+// Initialize refspectra elements and visibility file path
+if (strlen(xsdir) == 0) {
+    strcpy(refspectra[0], REFSPECTRA1);
+    strcpy(refspectra[1], REFSPECTRA2);
+    strcpy(refspectra[2], REFSPECTRA3);
+    strcpy(visibility_path, VISIBILITY_FILE);
+} else {
+    if (xsdir[strlen(xsdir) - 1] == '/') {
+        sprintf(refspectra[0], "%s%s", xsdir, REFSPECTRA1);
+        sprintf(refspectra[1], "%s%s", xsdir, REFSPECTRA2);
+        sprintf(refspectra[2], "%s%s", xsdir, REFSPECTRA3);
+        sprintf(visibility_path, "%s%s", xsdir, VISIBILITY_FILE);
+    } else {
+        sprintf(refspectra[0], "%s/%s", xsdir, REFSPECTRA1);
+        sprintf(refspectra[1], "%s/%s", xsdir, REFSPECTRA2);
+        sprintf(refspectra[2], "%s/%s", xsdir, REFSPECTRA3);
+        sprintf(visibility_path, "%s/%s", xsdir, VISIBILITY_FILE);
+    }
+}
 
 int    i, j, ie, stokes;
 double pol_deg, pos_ang, chi;
@@ -146,7 +162,7 @@ double vis_Theta[MAX_SIZE], vis_inc[MAX_SIZE];
 double x0, y, x1, y1, x2, y2;
 int count = 0, k;
 double trTheta, mue_tot, Theta_limit, min_Theta, max_Theta, true_Theta;
-char true_Theta_out;
+char true_Theta_out[32], inc_degrees[32];
 
 mue_tot = (float) param[1];
 trTheta = (float) param[2];
@@ -245,10 +261,14 @@ min_Theta = fmax(25.0, Theta_limit);
 max_Theta = 90.0;
 true_Theta = trTheta * (max_Theta - min_Theta) + min_Theta;
 
-//sprintf(true_Theta_out, "%12.6f\n", true_Theta);
-//FPMSTR(ptrue_Theta_out, true_Theta_out);
+sprintf(true_Theta_out, "%12.6f", true_Theta);
+FPMSTR(ptrue_Theta_out, true_Theta_out);
+
+sprintf(inc_degrees, "%12.6f", x0);
+FPMSTR(pinc_degrees, inc_degrees);
+
 /******************************************************************************/
-//#ifdef OUTSIDE_XSPEC
+#ifdef OUTSIDE_XSPEC
 // let's write the input parameters to a file
 fw = fopen("parameters.txt", "w");
 fprintf(fw, "PhoIndex        %12.6f\n", param[0]);
@@ -261,8 +281,9 @@ fprintf(fw, "pos_ang        %12.6f\n", param[6]);
 fprintf(fw, "zshift      %12.6f\n", param[7]);
 fprintf(fw, "Stokes      %12d\n", (int) param[8]);
 fprintf(fw, "true_Theta      %12.6f\n", true_Theta);
+fprintf(fw, "inc_degrees      %12.6f\n", x0);
 fclose(fw);
-//#endif
+#endif
 /******************************************************************************/
 
 // interface with XSPEC

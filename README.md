@@ -105,6 +105,8 @@ additional information of the model:
  
 * **true_Theta**
   - the true half-opening angle Theta converted to degrees measured from the rotation axis
+* **inc_degrees**
+  - inclination in degrees measured from the rotation axis, i.e. "acos(cos_incl)/PI*180."
   
 
 Required files
@@ -150,9 +152,10 @@ Installation and usage in XSPEC
 5. **Load the xsstokes_torus model** into XSPEC:
 
    To use the xsstokes_torus model inside XSPEC, first the model package needs to be 
-   loaded and directory containing the xsstokes_torus set:
+   loaded and you can also setup a directory containing the xsstokes_torus set:
 
    `lmod stokesni /path/to/xsstokes_torus-master`  
+   `xset XSDIR /path/to/xsstokes_torus-master`
 
 6. Then the **xsstokes_torus model may be used** in the usual way, e.g.:
 
