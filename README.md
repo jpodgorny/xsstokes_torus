@@ -11,8 +11,6 @@ Table of contents
 Model description
 =================
 
-!! CAUTION, THE MODEL IS STILL IN A TESTING MODE !!
-
 This model computes the emission and its polarisation properties from
 an X-ray source of power-law emission of arbitrary incident polarisation 
 that is reprocessed in axially symmetric structures. The reprocessing
@@ -25,11 +23,11 @@ reprocessing tables that were precomputed for nearly neutral disc reflection.
 In this case of xsstokes_torus, it is reflection from a toroidal structure,
 representing an opaque AGN torus illuminated by a central hot X-ray corona.
 More details on the reflection model that was computed using the routine
-torus_integrator.py are given in Podgorný J. et al. (in prep.). Apart from
+torus_integrator.py are given in Podgorný J. et al. (2024). Apart from
 the incident polarisation degree and angle, the model then also depends on
 observer's inclination angle, the B switch that allows to compute reflection
 below the torus equator (yes/no), the transformed half-opening angle of the 
-torus (see Podgorný J. et al., in prep., for details),
+torus (see Podgorný J. et al., 2024, for details),
 the primary power-law index Gamma, the position angle on the sky, and
 the overall Dopler shift. No relativistic effects inside the system 
 are taken into account. All components are static. The central source
@@ -44,9 +42,14 @@ For any issues regarding the use of xsstokes_torus, please, contact J. Podgorný
 References
 ==========
 
-Podgorný J, Dovčiak M, Marin F (2023)  
-_Simple numerical X-ray polarization models of reflecting axially symmetric structures around accreting compact objects_  
-[MNRAS, submitted]()
+Podgorný J, Dovčiak M, Marin F, Goosmann RW and Różańska A (2022)
+_Spectral and polarization properties of reflected X-ray emission from black hole accretion discs_
+[MNRAS, 510, pp.4723-4735](https://doi.org/10.1093/mnras/stab3714)
+[[arXiv:2201.07494](https://arxiv.org/abs/2201.07494)]
+
+Podgorný J, Dovčiak M, Marin F (2024)
+_Simple numerical X-ray polarization models of reflecting axially symmetric structures around accreting compact objects_
+[MNRAS, 530, pp.2608-2626](https://doi.org/10.1093/mnras/stae1009)
 [[arXiv:2310.15647](https://arxiv.org/abs/2310.15647)]
 
 
@@ -116,7 +119,7 @@ Required files
   - xsstokes_torus.c
   - lmodel-stokesni.dat  
 * **reprocessing tables**
-  (for reprocessing of photons in distant opaque toroidal structure, more details in Podgorný J. et al. (in prep.))
+  (for reprocessing of photons in distant opaque toroidal structure, more details in Podgorný J. et al. (2024))
   - [23576493.zip](https://doi.org/10.6084/m9.figshare.23576493)  
 * **Theta limit function**
   - visbility_line.txt

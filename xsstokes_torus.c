@@ -3,11 +3,6 @@
  *        - an example of a polarisation subroutine for XSPEC using tables 
  *          computed with torus_integrator.py code
  * 
- * -----------------------------------------------------------------------------
- *
- * !! CAUTION, THE MODEL IS STILL IN A TESTING MODE !!
- *
- * -----------------------------------------------------------------------------
  *
  * par1 ... PhoIndex - power-law photon index of the primary flux
  * par2 ... cos_incl - cosine of the observer inclination (1.-pole, 0.-disc)
@@ -48,10 +43,18 @@
  *                    =  8 - array of Stokes parameter Q devided by I
  *                    =  9 - array of Stokes parameter U devided by I
  *                    = 10 - array of Stokes parameter V devided by I
+ * par10 ... norm - if the distance to the source D [pc] is known, this
+ *                  parameter allows to check consistency of the best-fit value
+ *                  with the expected illuminating total flux from the central
+ *                  source in the equatorial plane at the distance of 1 pc from
+ *                  the center as F_in [erg / cm^2 / s] = 3.98*10^(-15)*D^2*norm,
+ *                  which can be also estimated e.g. with a simultaneously used
+ *                  comptonization model
  *
  ******************************************************************************/
 
 #include <math.h>
+#include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -67,7 +70,7 @@
 
 int main() {
 
-void stokes(const double *ear, int ne, const double *param, int ifl, 
+int stokes(const double *ear, int ne, const double *param, int ifl,
                double *photar, double *photer, const char* init);
 
 double ear[NE+1], photar[NE], photer[NE], param[NPARAM];
@@ -114,7 +117,7 @@ extern void   tabintxflt(float* ear, int ne, float* param, const int npar,
                          const float *xfltvalue, const int nxflt,
                          const char* tabtyp, float* photar, float* photer);
 
-void stokes(const double *ear, int ne, const double *param, int ifl, 
+int stokes(const double *ear, int ne, const double *param, int ifl,
             double *photar, double *photer, const char* init) {
 
 
@@ -144,7 +147,7 @@ if (strlen(xsdir) == 0) {
         sprintf(visibility_path, "%s/%s", xsdir, VISIBILITY_FILE);
     }
 }
-
+    
 int    i, j, ie, stokes;
 double pol_deg, pos_ang, chi;
 const char*   xfltname = "Stokes";
@@ -352,5 +355,5 @@ else {
 }
 
 
-return;
+return 0;
 }
