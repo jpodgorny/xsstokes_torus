@@ -103,7 +103,7 @@ Model parameters
     parameter allows to check consistency of the best-fit value
     with the expected illuminating total flux from the central
     source in the equatorial plane at the distance of 1 pc from
-    the center as F_in [erg / cm^2 / s] = 3.98*10^(-15)*D^2*norm,
+    the center as F_in [erg / cm^2 / s] = 3.98 * 10^(-15) * D^2 * norm,
     which can be also estimated e.g. with a simultaneously used
     comptonization model
 
