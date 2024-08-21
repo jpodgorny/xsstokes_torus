@@ -98,6 +98,14 @@ Model parameters
     -  8: array of Stokes parameter Q devided by I
     -  9: array of Stokes parameter U devided by I
     - 10: array of Stokes parameter V devided by I
+* **par10 ... norm**
+  - if the distance to the source D [pc] is known, this
+    parameter allows to check consistency of the best-fit value
+    with the expected illuminating total flux from the central
+    source in the equatorial plane at the distance of 1 pc from
+    the center as F_in [erg / cm^2 / s] = 3.98*10^(-15)*D^2*norm,
+    which can be also estimated e.g. with a simultaneously used
+    comptonization model
 
 
 Further output of the model
