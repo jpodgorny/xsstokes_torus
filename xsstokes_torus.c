@@ -112,6 +112,7 @@ return(0);
 extern int    xs_write(char* wrtstr, int idest);
 extern float  DGFILT(int ifl, const char* key);
 extern void   FPMSTR(const char* value1, const char* value2);
+extern char*  FGMSTR(char* dname);
 extern void   tabintxflt(float* ear, int ne, float* param, const int npar, 
                          const char* filenm, const char **xfltname, 
                          const float *xfltvalue, const int nxflt,
@@ -122,13 +123,15 @@ int stokes(const double *ear, int ne, const double *param, int ifl,
 
 
 FILE   *fw;
+static int first = 1;
+int status = 0;
 static char   xsdir[255]="";
 static char   pname[128]="XSDIR", ptrue_Theta_out[128] = "true_Theta", pinc_degrees[128] = "inc_degrees";
 static char refspectra[3][255], visibility_path[255];
 
 // - if set try XSDIR directory, otherwise look in the working directory
-//   or in the xspec directory where tables are usually stored...
 // Initialize refspectra elements and visibility file path
+sprintf(xsdir, "%s", FGMSTR(pname));
 if (strlen(xsdir) == 0) {
     strcpy(refspectra[0], REFSPECTRA1);
     strcpy(refspectra[1], REFSPECTRA2);
@@ -189,13 +192,21 @@ if(stokes == -1){
 //XSPEC routine tabintxflt
 //Note that we do not use errors here
 for(ie = 0; ie <= ne; ie++) fl_ear[ie] = (float) ear[ie];
-if(stokes){//we use polarised tables  
+if(stokes){//we use polarised tables
+  if (first) {
+// The status parameter must always be initialized.
+  status = 0;
+
   for (i = 0; i <= 2; i++)
     for (j = 0; j <= 2; j++){
       xfltvalue = (float) j;
       tabintxflt(fl_ear, ne, fl_param, NPAR, refspectra[i], &xfltname, 
                  &xfltvalue, 1, tabtyp, Smatrix[i*3+j], fl_photer);  
       }
+
+  first = 0;
+  }
+
 
   //Let's perform the transformation to initial primary polarisation degree and angle
   for(ie = 0; ie < ne; ie++) {
@@ -218,9 +229,18 @@ if(stokes){//we use polarised tables
     // var[ie] = 0.;   
   }
 }else{//we just use unpolarised counts
+  if (first) {
+
+  // The status parameter must always be initialized.
+  status = 0;
+
   xfltvalue = 0.;
   tabintxflt(fl_ear, ne, fl_param, NPAR, refspectra[0], &xfltname, &xfltvalue, 
              1, tabtyp, Smatrix[0], fl_photer);  
+
+  first = 0;
+  }
+
   for(ie = 0; ie < ne; ie++){
     far[ie] = Smatrix[0][ie];
   }
@@ -228,6 +248,12 @@ if(stokes){//we use polarised tables
 
 
 // let's transform trTheta back to true_theta
+
+
+
+// The status parameter must always be initialized.
+status = 0;
+
 
 file = fopen(VISIBILITY_FILE, "rt");
 if (file == NULL) {
@@ -239,6 +265,8 @@ while (fscanf(file, "%lf %lf", &vis_Theta[count], &vis_inc[count]) == 2) {
 count++;
 }
 fclose(file);
+
+
 
 x0 = acos(mue_tot) / PI * 180.0;  // Interpolation point
 
