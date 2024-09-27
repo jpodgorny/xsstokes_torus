@@ -153,7 +153,7 @@ Installation and usage in XSPEC
    the source files and FITS tables are in the directory 
    '/path/to/xsstokes_torus-master'):
 
-   `initpackage stokesni lmodel-stokesni.dat /path/to/xsstokes_torus-master`
+   `initpackage stokestorus lmodel-stokestorus.dat /path/to/xsstokes_torus-master`
 
    **Note**:
    Your XSPEC installation must have been originally installed from the source 
@@ -165,12 +165,12 @@ Installation and usage in XSPEC
    To use the xsstokes_torus model inside XSPEC, first the model package needs to be 
    loaded and you can also setup a directory containing the xsstokes_torus set:
 
-   `lmod stokesni /path/to/xsstokes_torus-master`  
+   `lmod stokestorus /path/to/xsstokes_torus-master`
    `xset XSDIR /path/to/xsstokes_torus-master`
 
 6. Then the **xsstokes_torus model may be used** in the usual way, e.g.:
 
-   `mo stokes`
+   `mo stokestorus`
 
    **Note**:
    In case of segmentation fault, one may need to increase the stack size before 

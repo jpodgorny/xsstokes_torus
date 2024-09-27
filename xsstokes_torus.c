@@ -70,7 +70,7 @@
 
 int main() {
 
-int stokes(const double *ear, int ne, const double *param, int ifl,
+int stokesnitorus(const double *ear, int ne, const double *param, int ifl,
                double *photar, double *photer, const char* init);
 
 double ear[NE+1], photar[NE], photer[NE], param[NPARAM];
@@ -92,7 +92,7 @@ for(ie = 0; ie <= NE; ie++) {
   ear[ie] = E_MIN * pow(E_MAX / E_MIN, ((double) ie) / NE);
 }
 
-stokes(ear, NE, param, IFL, photar, photer, initstr);
+stokesnitorus(ear, NE, param, IFL, photar, photer, initstr);
 return(0);
 }
 
@@ -118,7 +118,7 @@ extern void   tabintxflt(float* ear, int ne, float* param, const int npar,
                          const float *xfltvalue, const int nxflt,
                          const char* tabtyp, float* photar, float* photer);
 
-int stokes(const double *ear, int ne, const double *param, int ifl,
+int stokesnitorus(const double *ear, int ne, const double *param, int ifl,
             double *photar, double *photer, const char* init) {
 
 
