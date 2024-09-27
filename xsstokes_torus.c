@@ -123,7 +123,7 @@ int stokesnitorus(const double *ear, int ne, const double *param, int ifl,
 
 
 FILE   *fw;
-static int first = 1;
+//static int first = 1;
 int status = 0;
 static char   xsdir[255]="";
 static char   pname[128]="XSDIR", ptrue_Theta_out[128] = "true_Theta", pinc_degrees[128] = "inc_degrees";
@@ -193,7 +193,7 @@ if(stokes == -1){
 //Note that we do not use errors here
 for(ie = 0; ie <= ne; ie++) fl_ear[ie] = (float) ear[ie];
 if(stokes){//we use polarised tables
-  if (first) {
+//  if (first) {
 // The status parameter must always be initialized.
   status = 0;
 
@@ -204,8 +204,8 @@ if(stokes){//we use polarised tables
                  &xfltvalue, 1, tabtyp, Smatrix[i*3+j], fl_photer);  
       }
 
-  first = 0;
-  }
+//  first = 0;
+//  }
 
 
   //Let's perform the transformation to initial primary polarisation degree and angle
@@ -229,7 +229,7 @@ if(stokes){//we use polarised tables
     // var[ie] = 0.;   
   }
 }else{//we just use unpolarised counts
-  if (first) {
+//  if (first) {
 
   // The status parameter must always be initialized.
   status = 0;
@@ -238,8 +238,8 @@ if(stokes){//we use polarised tables
   tabintxflt(fl_ear, ne, fl_param, NPAR, refspectra[0], &xfltname, &xfltvalue, 
              1, tabtyp, Smatrix[0], fl_photer);  
 
-  first = 0;
-  }
+//  first = 0;
+//  }
 
   for(ie = 0; ie < ne; ie++){
     far[ie] = Smatrix[0][ie];
